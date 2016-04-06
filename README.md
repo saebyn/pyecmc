@@ -1,5 +1,7 @@
 # pyecmc - A Python module that wraps python-memcached with AWS Elasticache autodiscovery.
 
+[![Build Status](https://travis-ci.org/saebyn/pyecmc.svg?branch=master)](https://travis-ci.org/saebyn/pyecmc)
+
 ## Introduction
 Provides a `ecmc.MemcacheClient` class that uses AWS Elasticache autodiscovery
 to find all servers in the Elasticache cluster, proxy's `memcache.Client` from
