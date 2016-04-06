@@ -18,13 +18,9 @@ http://docs.aws.amazon.com/AmazonElastiCache/latest/UserGuide/AutoDiscovery.html
 
 ## Installation
 
-First, install python_memcached and hash_ring, pyecmc depend on them:
-
-    pip install python_memcached hash_ring
-
-Then, install pyecmc:
-
-    pip install ecmc
+```bash
+    $ pip install ecmc
+```
 
 
 ## Code example
