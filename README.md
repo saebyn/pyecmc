@@ -1,38 +1,45 @@
-# do auto discovery for aws elasticache
+# pyecmc - A Python module that wraps python-memcached with AWS Elasticache autodiscovery.
 
-## introduce
-Implement aws elasticache auto discovery, for detail about auto discovery, please reference to:
+## Introduction
+Provides a `ecmc.MemcacheClient` class that uses AWS Elasticache autodiscovery
+to find all servers in the Elasticache cluster, proxy's `memcache.Client` from
+[python-memcached](https://pypi.python.org/pypi/python-memcached), and uses
+[hash_ring](https://pypi.python.org/pypi/hash_ring/) to provide consistent
+hashing to determine the correct server within the cluster for a given key
+even when servers are added or removed.
+
+For detail on AWS Elasticache autodiscovery, please reference:
 
 http://docs.aws.amazon.com/AmazonElastiCache/latest/UserGuide/AutoDiscovery.html
 
-It uses python-memcached implements memcache command, and use hash_ring implements consistent hash, below links have more detail about python-memcached and hash_ring:
 
-https://pypi.python.org/pypi/python-memcached
 
-https://pypi.python.org/pypi/hash_ring/
+## Installation
 
-## install
-First, install python_memcached and hash_ring, elasticache_pyclient depend on them:
+First, install python_memcached and hash_ring, pyecmc depend on them:
 
     pip install python_memcached hash_ring
 
-Then, install elasticache_pyclient:
+Then, install pyecmc:
 
-    pip install elasticache_pyclient
+    pip install ecmc
 
-## usage
 
-    >>> from elasticache_pyclient import MemcacheClient
+## Code example
+
+```python
+    >>> from ecmc import MemcacheClient
     >>> mc = MemcacheClient('test.lwgyhw.cfg.usw2.cache.amazonaws.com:11211')
     >>> mc.set('foo', 'bar')
     True
     >>> mc.get('foo')
     'bar'
+```
 
-Besides set and get, it supports all the python-memcached methods, to examine all the python-memcached methods, you can run these commands in python interpreter:
+All methods available for `memcached.Client` from python-memcached are
+available on the `MemcacheClient` instance.
 
-    import memcache
-    help(memcache.Client)
 
-## version support
-The elasticache_pyclient package is tested on python 2.6 and 2.7. If anyone need python 3.0 support, please create an issue for me on the github project.
+## License
+
+GNU LGPL v3. See the `LICENSE` file.

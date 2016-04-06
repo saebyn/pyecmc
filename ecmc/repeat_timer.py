@@ -1,7 +1,9 @@
-#! /usr/bin/env python
-
+import logging
 from threading import Thread, Event
-from elasticache_pyclient import elasticache_logger
+
+
+elasticache_logger = logging.getLogger('elasticache_logger')
+
 
 class RepeatTimer(Thread):
     def __init__(self, name, interval, func, args=[], kwargs={}, daemonic=True, break_on_err=True):
@@ -11,8 +13,9 @@ class RepeatTimer(Thread):
         self.kwargs = kwargs
         self.break_on_err = break_on_err
         self.stop_event = Event()
-        Thread.__init__(self,name=name)
+        super(RepeatTimer, self).__init__(name=name)
         self.setDaemon(daemonic)
+
     def run(self):
         while not self.stop_event.wait(self.interval):
             # before python2.7, Event.wait() always return None
@@ -21,14 +24,16 @@ class RepeatTimer(Thread):
                 break
             try:
                 self.func(*self.args, **self.kwargs)
-            except Exception, e:
+            except Exception:
                 if hasattr(self.func, '__name__'):
                     func_name = self.func.__name__
                 else:
                     func_name = ''
+
                 msg = '%s %s failed' % (str(self.func), func_name)
                 elasticache_logger.exception(msg)
-                if break_on_err:
+                if self.break_on_err:
                     break
+
     def stop_timer(self):
         self.stop_event.set()

@@ -1,13 +1,17 @@
-#! /usr/bin/env python
+from __future__ import absolute_import
 
+import logging
 import re
 from threading import Lock
 from types import MethodType
 from telnetlib import Telnet
 from distutils.version import StrictVersion
 from hash_ring import MemcacheRing
-from elasticache_pyclient import elasticache_logger
-from elasticache_pyclient.repeat_timer import RepeatTimer
+from .repeat_timer import RepeatTimer
+
+
+elasticache_logger = logging.getLogger('elasticache_logger')
+
 
 class ElasticacheInvalidTelentReplyError(Exception):
     """
@@ -15,10 +19,12 @@ class ElasticacheInvalidTelentReplyError(Exception):
     """
     def __init__(self, msg):
         self.msg = msg
+
     def __str__(self):
         return self.msg
 
-class Cluster():
+
+class Cluster(object):
     """
     get the cluster configuration, store version and node list
     """
@@ -42,7 +48,7 @@ class Cluster():
         else:
             get_cluster = 'get AmazonElastiCache:cluster\n'
         tn.write(get_cluster)
-        ret = tn.read_until('END\r\n',  timeout)
+        ret = tn.read_until('END\r\n', timeout)
         elasticache_logger.debug('config: %s', ret)
         tn.close()
         p = re.compile(r'\r?\n')
@@ -58,7 +64,8 @@ class Cluster():
                 raise ElasticacheInvalidTelentReplyError(ret)
             self.servers.append(node_list[1] + ':' + node_list[2])
 
-class MemcacheClient():
+
+class MemcacheClient(object):
     """
     Do autodiscovery for elasticache memcache cluster.
     """
@@ -96,7 +103,9 @@ class MemcacheClient():
         if not hasattr(self.ring, key):
             msg = "'%s' object has no attribute '%s'" % (type(self).__name__, key)
             raise AttributeError(msg)
+
         ori_func = getattr(self.ring, key)
+
         def tmp_func(self, *args, **kwargs):
             self.lock.acquire(True)
             if self.need_update:
@@ -104,14 +113,16 @@ class MemcacheClient():
                 self.need_update = False
             self.lock.release()
             return ori_func(*args, **kwargs)
+
         tmp_func.__name__ = key
+
         return MethodType(tmp_func, self)
 
     def _update(self):
         try:
             cluster = Cluster(self.endpoint, self.autodiscovery_timeout)
-        except Exception, e:
-            elasticache_logger.debug(e)
+        except Exception:
+            elasticache_logger.exception('Failed to retrieve cluster information.')
             return
         if cluster.version != self.cluster.version:
             self.lock.acquire(True)

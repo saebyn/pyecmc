@@ -1,4 +1,4 @@
 *.pyc
-elasticache_pyclient.egg-info
+ecmc.egg-info
 dist
 *.log
