@@ -2,3 +2,4 @@
 ecmc.egg-info
 dist
 *.log
+.cache
