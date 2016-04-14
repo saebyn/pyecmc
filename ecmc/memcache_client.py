@@ -29,7 +29,11 @@ class Cluster(object):
     get the cluster configuration, store version and node list
     """
 
-    def __init__(self, endpoint, timeout):
+    def __init__(self):
+        self.servers = []
+        self.version = None
+        
+    def refresh(self, endpoint, timeout):
         host, port = endpoint.split(':')
         elasticache_logger.debug('cluster: %s %s %s %s %s %s',
                                  str(host), str(type(host)),
@@ -56,7 +60,6 @@ class Cluster(object):
         if len(conf) != 6 or conf[4][0:3] != 'END':
             raise ElasticacheInvalidTelentReplyError(ret)
         self.version = conf[1]
-        self.servers = []
         nodes_str = conf[2].split(' ')
         for node_str in nodes_str:
             node_list = node_str.split('|')
@@ -91,7 +94,12 @@ class MemcacheClient(object):
         self.endpoint = endpoint
         self.autodiscovery_timeout = autodiscovery_timeout
         elasticache_logger.debug('endpoint: %s' % endpoint)
-        self.cluster = Cluster(endpoint, autodiscovery_timeout)
+        self.cluster = Cluster()
+        try:
+            self.cluster.refresh(endpoint, autodiscovery_timeout)
+        except Exception:
+            elasticache_logger.exception('Failed to retrieve cluster information.')
+
         self.ring = MemcacheRing(self.cluster.servers, *args, **kwargs)
         self.need_update = False
         self.lock = Lock()
@@ -120,7 +128,7 @@ class MemcacheClient(object):
 
     def _update(self):
         try:
-            cluster = Cluster(self.endpoint, self.autodiscovery_timeout)
+            self.cluster.refresh(self.endpoint, self.autodiscovery_timeout)
         except Exception:
             elasticache_logger.exception('Failed to retrieve cluster information.')
             return
