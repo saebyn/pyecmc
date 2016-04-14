@@ -127,14 +127,14 @@ class MemcacheClient(object):
         return MethodType(tmp_func, self)
 
     def _update(self):
+        old_version = self.cluster.version
         try:
             self.cluster.refresh(self.endpoint, self.autodiscovery_timeout)
         except Exception:
             elasticache_logger.exception('Failed to retrieve cluster information.')
             return
-        if cluster.version != self.cluster.version:
+        if old_version != self.cluster.version:
             self.lock.acquire(True)
-            self.cluster = cluster
             self.need_update = True
             self.lock.release()
 
