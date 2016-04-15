@@ -1,5 +1,5 @@
 *.pyc
-ecmc.egg-info
+pyecmc.egg-info
 dist
 *.log
 .cache

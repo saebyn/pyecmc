@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 import unittest
 from mock import Mock, patch
@@ -23,6 +23,34 @@ class TestMemcacheClient(unittest.TestCase):
     def test_1_4_5(self, memcachering_mock, telnet_mock):
         read_until_ret_list = ['VERSION 1.4.5\r\n', 'VALUE AmazonElastiCache:cluster 0 190\r\n1\ntest2.rtstcw.0001.apne1.cache.amazonaws.com|172.31.8.153|11211 test2.rtstcw.0002.apne1.cache.amazonaws.com|172.31.0.98|11211 test2.rtstcw.0003.apne1.cache.amazonaws.com|172.31.2.116|11211\n\r\nEND\r\n']
         self.do_init_and_set(memcachering_mock, telnet_mock, read_until_ret_list)
+
+    def test_no_update(self):
+        cluster = Mock()
+        cluster.version = None
+
+        endpoint = 'test.lwgyhw.cfg.usw2.cache.amazonaws.com:11211'
+        mc = MemcacheClient(endpoint)
+        mc.cluster = cluster
+        mc._update()
+        assert not mc.need_update
+
+    def test_update(self):
+        cluster = Mock()
+        cluster.version = None
+
+        def refresh(endpoint, timeout):
+            print('refresh called')
+            cluster.version = 1
+
+        cluster.refresh.side_effect = refresh
+
+        endpoint = 'test.lwgyhw.cfg.usw2.cache.amazonaws.com:11211'
+        mc = MemcacheClient(endpoint)
+        mc.cluster = cluster
+        print('version before', mc.cluster.version)
+        mc._update()
+        print('version after', mc.cluster.version)
+        assert mc.need_update
 
     def do_init_and_set(self, memcachering_mock, telnet_mock, read_until_ret_list):
         tn_mock = Mock()

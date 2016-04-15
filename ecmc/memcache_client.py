@@ -32,7 +32,7 @@ class Cluster(object):
     def __init__(self):
         self.servers = []
         self.version = None
-        
+
     def refresh(self, endpoint, timeout):
         host, port = endpoint.split(':')
         elasticache_logger.debug('cluster: %s %s %s %s %s %s',
