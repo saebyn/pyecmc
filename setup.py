@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 PACKAGE = 'ecmc'
 NAME = 'pyecmc'
 KEYWORDS = ('aws', 'elasticache', 'memcached')
-VERSION = '0.1.0'
+VERSION = '0.1.1'
 DESCRIPTION = 'A Python module that wraps python-memcached with AWS Elasticache autodiscovery.'
 LICENSE = 'LGPL'
 URL = 'https://github.com/saebyn/pyecmc'
