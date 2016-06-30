@@ -41,3 +41,5 @@ available on the `MemcacheClient` instance.
 ## License
 
 GNU LGPL v3. See the `LICENSE` file.
+
+Most of this code came from https://github.com/yupeng820921/elasticache_pyclient .
