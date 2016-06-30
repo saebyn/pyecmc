@@ -3,3 +3,4 @@ pyecmc.egg-info
 dist
 *.log
 .cache
+.coverage
